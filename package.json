@@ -15,5 +15,8 @@
     "url": "https://github.com/lolasanchezz/secApi/issues"
   },
   "homepage": "https://github.com/lolasanchezz/secApi#readme",
-  "description": ""
+  "description": "",
+  "dependencies": {
+    "express": "^4.19.2"
+  }
 }
