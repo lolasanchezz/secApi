@@ -1,7 +1,9 @@
 const express = require("express");
 const path = require("path");
 const app = express ();
+const cors = require('cors');
 
+app.use(cors());
 app.use(express.json());
 const PORT = 3000;
 app.listen(PORT, () => {
@@ -75,28 +77,64 @@ app.listen(PORT, () => {
      
  });
 
- app.get("/companyconcept/:cid/:concept" , (request, response) => {
-   let responseConceptData;
-   const options = {
-      hostname: 'data.sec.gov',
-      path: "api/xbrl/companyconcept/CIK0000812011/us-gaap/DividendsCash.json",
-      method: 'GET',
-      headers: {
-        'User-Agent': 'lola sanchez lsanchez@gcschool.org'
-   }
-   };
-   const req = https.request(options, (resp) => {
+//https://data.sec.gov/api/xbrl/companyconcept/CIK0000812011/us-gaap/AccountsPayableCurrent.json
+
+
+ app.get("/companyconcept/:cid/:unit/:datapoint" , (request, response) => {
+  let rawResponseData;
+  //api getting part
+  
+  const https = require('https'); // Import the https module
+  const options1 = {
+    hostname: 'data.sec.gov',
+    path: "/api/xbrl/companyconcept/${request.params.cid}/${request.params.unit}/${request.params.datapoint}.json",
+    method: 'GET',
+    headers: {
+      'User-Agent': 'lola sanchez lsanchez@gcschool.org', // Replace with your contact info // If authentication is needed, replace with your actual token
+    }
+  };
+  
+
+  const reqSec = https.request(options1, (resp) => {
       let data = '';
+    
+      // A chunk of data has been received. Append it to `data`.
+      try {
       resp.on('data', (chunk) => {
-         data += chunk;
+        data += chunk;
       });
+     
+      // The whole response has been received. Parse the XML data.
       resp.on('end', () => {
-         responseConceptData = JSON.parse(data);
-         const responseData = {
-            "dataReturned": responseConceptData
-         };
-         response.send(responseData);
+       
+       
+       const responseData = {
+        "dataReturned": data
+       };
+       response.send(responseData);
+       
       });
-   });
-   req.end();
- });
+    
+    
+  } catch (error){
+    console.error('error:', error);
+    response.status(500).send(`Problem with request: ${e.message}`);
+
+  }
+    
+    // Handle errors
+    
+    
+    reqSec.end();
+    
+
+});
+    
+});
+
+
+
+
+
+
+
