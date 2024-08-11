@@ -42,7 +42,7 @@ app.listen(PORT, () => {
      path: "https://data.sec.gov/api/xbrl/companyfacts/" + request.params.cid + ".json",
      method: 'GET',
      headers: {
-       'User-Agent': 'lola sanchez lsanchez@gcschool.org', // Replace with your contact info // If authentication is needed, replace with your actual token
+       'User-Agent': 'lola sanchez', // Replace with your contact info // If authentication is needed, replace with your actual token
      }
    };
    
@@ -88,29 +88,30 @@ app.listen(PORT, () => {
   const https = require('https'); // Import the https module
   const options1 = {
     hostname: 'data.sec.gov',
-    path: '/api/xbrl/companyconcept/${request.params.cid}/${request.params.unit}/${request.params.datapoint}.json',
+    path: `/api/xbrl/companyconcept/${request.params.cid}/${request.params.unit}/${request.params.datapoint}.json`,
     method: 'GET',
     headers: {
-      'User-Agent': 'lola sanchez lsanchez@gcschool.org', // Replace with your contact info // If authentication is needed, replace with your actual token
+      'User-Agent': 'lola sanchez lsanchez@gcschool.org', 
     }
   };
   
 
   const reqSec = https.request(options1, (resp) => {
     let data = '';
-
+    
     resp.on('data', (chunk) => {
         data += chunk;
     });
 
+
+
+  
     resp.on('end', () => {
         try {
             console.log(data);
-            //const responseData = { "dataReturned": ParseXbrl.parseStr(data)};
             response.send(data);
         } catch (error) {
-            console.error('parse error:', error);
-            response.status(500).send('Error parsing XML');
+            console.error('recieving data error:', error);
         }
     });
 });
