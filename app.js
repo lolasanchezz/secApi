@@ -2,6 +2,7 @@ const express = require("express");
 const path = require("path");
 const app = express ();
 const cors = require('cors');
+var ParseXbrl = require('parse-xbrl');
 
 app.use(cors());
 app.use(express.json());
@@ -87,7 +88,7 @@ app.listen(PORT, () => {
   const https = require('https'); // Import the https module
   const options1 = {
     hostname: 'data.sec.gov',
-    path: "/api/xbrl/companyconcept/${request.params.cid}/${request.params.unit}/${request.params.datapoint}.json",
+    path: '/api/xbrl/companyconcept/${request.params.cid}/${request.params.unit}/${request.params.datapoint}.json',
     method: 'GET',
     headers: {
       'User-Agent': 'lola sanchez lsanchez@gcschool.org', // Replace with your contact info // If authentication is needed, replace with your actual token
@@ -96,40 +97,30 @@ app.listen(PORT, () => {
   
 
   const reqSec = https.request(options1, (resp) => {
-      let data = '';
-    
-      // A chunk of data has been received. Append it to `data`.
-      try {
-      resp.on('data', (chunk) => {
+    let data = '';
+
+    resp.on('data', (chunk) => {
         data += chunk;
-      });
-     
-      // The whole response has been received. Parse the XML data.
-      resp.on('end', () => {
-       
-       
-       const responseData = {
-        "dataReturned": data
-       };
-       response.send(responseData);
-       
-      });
-    
-    
-  } catch (error){
-    console.error('error:', error);
-    response.status(500).send(`Problem with request: ${e.message}`);
+    });
 
-  }
-    
-    // Handle errors
-    
-    
-    reqSec.end();
-    
-
+    resp.on('end', () => {
+        try {
+            console.log(data);
+            //const responseData = { "dataReturned": ParseXbrl.parseStr(data)};
+            response.send(data);
+        } catch (error) {
+            console.error('parse error:', error);
+            response.status(500).send('Error parsing XML');
+        }
+    });
 });
-    
+
+reqSec.on('error', (e) => {
+    console.error('Request error:', e);
+    response.status(500).send(`Problem with request: ${e.message}`);
+});
+
+reqSec.end();
 });
 
 

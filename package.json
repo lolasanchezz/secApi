@@ -19,5 +19,8 @@
   "dependencies": {
     "cors": "^2.8.5",
     "express": "^4.19.2"
+  },
+  "devDependencies": {
+    "parse-xbrl": "^1.1.5"
   }
 }
