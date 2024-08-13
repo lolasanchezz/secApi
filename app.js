@@ -175,13 +175,18 @@ const req = https.request(options, (resp) => {
           //need to turn data into array'
           for (let i = 0; i < Object.keys(rawResponseData).length; i++) {
           let newArray = [i, rawResponseData[i].ticker];
-          dataArray.push([newArray]);
+          dataArray.push(newArray);
           }
           for (let i = 0; i < dataArray.length; i++) {
             let istr = i.toString();
             ii = i;
-          if (dataArray[i+1] == (nameRequested.toUpperCase())) {
-            response.send(rawResponseData[istr].cik_str);
+          if (dataArray[i][1] === (nameRequested.toUpperCase())) {
+            let foundCIK = (rawResponseData[i].cik_str).toString();
+            while (foundCIK.length < 10) {
+            foundCIK = "0" + foundCIK;
+            }
+            
+            response.send(foundCIK);
             cikFound = true;
             break;
             
@@ -190,7 +195,7 @@ const req = https.request(options, (resp) => {
 
           if (!(cikFound)) {
             response.status(404).send(
-              "CIK not found" + dataArray );
+              "not found" );
         } 
 
          
