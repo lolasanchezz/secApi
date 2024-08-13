@@ -129,11 +129,11 @@ reqSec.end();
 
 
 
-
+// https://www.sec.gov/files/company_tickers.json
 app.get("/cik/:cik" , (request, response) => {
   let rawResponseData;
   const options = {
-    hostname: 'data.sec.gov',
+    hostname: 'www.sec.gov',
     path: `/files/company_tickers.json`,
     method: 'GET',
     headers: {
@@ -146,7 +146,8 @@ const https = require('https');
 const req = https.request(options, (resp) => {
   let data = '';
   let cikFound = false;
-  
+  let nameRequested = request.params.cik;
+
   resp.on('data', (chunk) => {
       data += chunk;
   });
@@ -156,6 +157,8 @@ const req = https.request(options, (resp) => {
 
   resp.on('end', () => {
       try {
+          response.send(data);
+          /*
           console.log(data);
 
 
@@ -177,7 +180,7 @@ const req = https.request(options, (resp) => {
             
         }
 
-
+          */
 
       } catch (error) {
           console.error('recieving data error:', error);
@@ -190,9 +193,8 @@ req.on('error', (e) => {
   response.status(500).send(`problem: ${e.message}`);
 });
 
-nameRequested = request.params.cik;
 
-
+req.end();
 
 
 });
