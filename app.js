@@ -131,7 +131,10 @@ reqSec.end();
 
 // https://www.sec.gov/files/company_tickers.json
 app.get("/cik/:cik" , (request, response) => {
-  let rawResponseData;
+ 
+
+
+1
   const options = {
     hostname: 'www.sec.gov',
     path: `/files/company_tickers.json`,
@@ -144,9 +147,13 @@ app.get("/cik/:cik" , (request, response) => {
 const https = require('https');
 
 const req = https.request(options, (resp) => {
+  let rawResponseData;
+  const dataArray = [];
+  
   let data = '';
   let cikFound = false;
   let nameRequested = request.params.cik;
+  let ii = 0;
 
   resp.on('data', (chunk) => {
       data += chunk;
@@ -157,30 +164,36 @@ const req = https.request(options, (resp) => {
 
   resp.on('end', () => {
       try {
-          response.send(data);
-          /*
-          console.log(data);
+          
+          
+          
 
 
           rawResponseData = JSON.parse(data);
-          for (let i = 0; i < rawResponseData.length; i++) {
+          
+
+          //need to turn data into array'
+          for (let i = 0; i < Object.keys(rawResponseData).length; i++) {
+          let newArray = [i, rawResponseData[i].ticker];
+          dataArray.push([newArray]);
+          }
+          for (let i = 0; i < dataArray.length; i++) {
             let istr = i.toString();
-          if (rawResponseData[i][istr].ticker === (nameRequested.toUpperCase())) {
-            response.send(rawResponseData[i][istr].cik);
+            ii = i;
+          if (dataArray[i+1] == (nameRequested.toUpperCase())) {
+            response.send(rawResponseData[istr].cik_str);
             cikFound = true;
             break;
             
           }
           };
 
-          if (cikFound) {
-            response.send(cikFound);
-        } else {
-            response.status(404).send('CIK not found');
-            
-        }
+          if (!(cikFound)) {
+            response.status(404).send(
+              "CIK not found" + dataArray );
+        } 
 
-          */
+         
 
       } catch (error) {
           console.error('recieving data error:', error);
