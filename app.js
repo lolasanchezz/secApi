@@ -3,6 +3,7 @@ const path = require("path");
 const app = express ();
 const cors = require('cors');
 var ParseXbrl = require('parse-xbrl');
+const { hostname } = require("os");
 
 app.use(cors());
 app.use(express.json());
@@ -42,7 +43,7 @@ app.listen(PORT, () => {
      path: "https://data.sec.gov/api/xbrl/companyfacts/" + request.params.cid + ".json",
      method: 'GET',
      headers: {
-       'User-Agent': 'lola sanchez', // Replace with your contact info // If authentication is needed, replace with your actual token
+       'User-Agent': 'lola sanchez lsanchez@gcschool.org', // Replace with your contact info // If authentication is needed, replace with your actual token
      }
    };
    
@@ -58,9 +59,9 @@ app.listen(PORT, () => {
        // The whole response has been received. Parse the XML data.
        resp.on('end', () => {
         
-        rawResponseData = (JSON.parse(data));
-        const responseData = {
-         "dataReturned": rawResponseData
+      rawResponseData = (JSON.parse(data));
+       const responseData = {
+        "dataReturned": rawResponseData
         };
         response.send(rawResponseData);
         
@@ -129,4 +130,70 @@ reqSec.end();
 
 
 
+app.get("/cik/:cik" , (request, response) => {
+  let rawResponseData;
+  const options = {
+    hostname: 'data.sec.gov',
+    path: `/files/company_tickers.json`,
+    method: 'GET',
+    headers: {
+      'User-Agent': 'lola sanchez, lsanchez@gcschool.org'
+  }
+};
+
+const https = require('https');
+
+const req = https.request(options, (resp) => {
+  let data = '';
+  let cikFound = false;
+  
+  resp.on('data', (chunk) => {
+      data += chunk;
+  });
+
+
+
+
+  resp.on('end', () => {
+      try {
+          console.log(data);
+
+
+          rawResponseData = JSON.parse(data);
+          for (let i = 0; i < rawResponseData.length; i++) {
+            let istr = i.toString();
+          if (rawResponseData[i][istr].ticker === (nameRequested.toUpperCase())) {
+            response.send(rawResponseData[i][istr].cik);
+            cikFound = true;
+            break;
+            
+          }
+          };
+
+          if (cikFound) {
+            response.send(cikFound);
+        } else {
+            response.status(404).send('CIK not found');
+            
+        }
+
+
+
+      } catch (error) {
+          console.error('recieving data error:', error);
+      }
+  });
+
+});
+req.on('error', (e) => {
+  console.error('request error:', e);
+  response.status(500).send(`problem: ${e.message}`);
+});
+
+nameRequested = request.params.cik;
+
+
+
+
+});
 
