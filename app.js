@@ -36,7 +36,7 @@ app.listen(PORT, () => {
  app.get("/companyFacts/:cid" , (request, response) => {
    let rawResponseData;
    //api getting part
-   
+   console.log(request.params.cid)
    const https = require('https'); // Import the https module
    const options1 = {
      hostname: 'data.sec.gov',
@@ -185,12 +185,15 @@ const req = https.request(options, (resp) => {
             while (foundCIK.length < 10) {
             foundCIK = "0" + foundCIK;
             }
+            let companyName = rawResponseData[i].title
+            console.log([foundCIK, companyName])
+            response.send([foundCIK, companyName]);
             
-            response.send(foundCIK);
             cikFound = true;
             break;
             
           }
+          
           };
 
           if (!(cikFound)) {
